@@ -26,10 +26,13 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    lib/hcxselect/src/hcxselect.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    lib/hcxselect/src/hcxselect.h \
+    lib/hcxselect/src/lexer.h
 
 FORMS += \
         mainwindow.ui
@@ -38,3 +41,9 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/lib/htmlcxx/release/ -lhtmlcxx
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/lib/htmlcxx/debug/ -lhtmlcxx
+
+INCLUDEPATH += $$PWD/lib
+DEPENDPATH += $$PWD/lib
