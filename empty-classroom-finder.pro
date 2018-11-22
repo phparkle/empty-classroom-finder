@@ -1,49 +1,43 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2018-11-15T14:48:49
-#
-#-------------------------------------------------
-
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+QT       += core gui widgets network
 TARGET = empty-classroom-finder
 TEMPLATE = app
-
-# The following define makes your compiler emit warnings if you use
-# any feature of Qt which has been marked as deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-
-# You can also make your code fail to compile if you use deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    lib/hcxselect/src/hcxselect.cpp
+    main.cpp \
+    mainwindow.cpp \
+    global.cpp \
+    lib/htmlcxx/html/Extensions.cc \
+    lib/htmlcxx/html/Node.cc \
+    lib/htmlcxx/html/ParserDom.cc \
+    lib/htmlcxx/html/ParserSax.cc \
+    lib/htmlcxx/html/Uri.cc \
+    lib/htmlcxx/html/utils.cc \
+    lib/hcxselect/hcxselect.cpp
 
 HEADERS += \
-        mainwindow.h \
-    lib/hcxselect/src/hcxselect.h \
-    lib/hcxselect/src/lexer.h
+    mainwindow.h \
+    global.h \
+    lib/htmlcxx/html/ci_string.h \
+    lib/htmlcxx/html/debug.h \
+    lib/htmlcxx/html/Extensions.h \
+    lib/htmlcxx/html/Node.h \
+    lib/htmlcxx/html/ParserDom.h \
+    lib/htmlcxx/html/ParserSax.h \
+    lib/htmlcxx/html/tld.h \
+    lib/htmlcxx/html/tree.h \
+    lib/htmlcxx/html/Uri.h \
+    lib/htmlcxx/html/utils.h \
+    lib/hcxselect/hcxselect.h \
+    lib/hcxselect/lexer.h
 
 FORMS += \
-        mainwindow.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/lib/htmlcxx/release/ -lhtmlcxx
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/lib/htmlcxx/debug/ -lhtmlcxx
-
 INCLUDEPATH += $$PWD/lib
-DEPENDPATH += $$PWD/lib

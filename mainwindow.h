@@ -7,6 +7,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class QNetworkAccessManager;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -16,7 +18,9 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* const ui;
+
+    QNetworkAccessManager* const qnam;
 };
 
 #endif // MAINWINDOW_H
