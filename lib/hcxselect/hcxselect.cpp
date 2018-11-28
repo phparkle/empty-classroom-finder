@@ -742,6 +742,19 @@ NodeSet select(const tree<HTMLNode> &tree, const std::string &expr)
 	return select(v, expr);
 }
 
+// Applies a CSS selector expression to a single node.
+NodeSet select(Node* node, const std::string &expr)
+{
+    // Select the <html> node from the tree and use it as the root node
+    NodeSet v;
+    v.insert(node);
+
+    if (expr.empty()) {
+        return v;
+    }
+    return select(v, expr);
+}
+
 // Applies a CSS selector expression to a set of nodes.
 NodeSet select(const NodeSet &nodes, const std::string &expr)
 {
@@ -778,6 +791,16 @@ Selection::Selection(const tree<htmlcxx::HTML::Node> &tree, const std::string &e
 }
 
 /*!
+ * Constructs a selection from a single node and optionally
+ * applies a selector.
+ */
+Selection::Selection(Node* node, const std::string &expr)
+{
+    NodeSet v = hcxselect::select(node, expr);
+    insert(v.begin(), v.end());
+}
+
+/*!
  * Constructs a selection from a set of nodes and optionally 
  * applies a selector.
  */
@@ -795,7 +818,7 @@ Selection::Selection(const NodeSet &nodes, const std::string &expr)
  * Returns a new selection by selecting elements from this 
  * selection using the given selector expression.
  */
-Selection Selection::select(const std::string &expr)
+Selection Selection::select(const std::string &expr) const
 {
 	return hcxselect::select(*this, expr);
 }

@@ -14,7 +14,8 @@ SOURCES += \
     lib/htmlcxx/html/ParserSax.cc \
     lib/htmlcxx/html/Uri.cc \
     lib/htmlcxx/html/utils.cc \
-    lib/hcxselect/hcxselect.cpp
+    lib/hcxselect/hcxselect.cpp \
+    httpclient.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -30,7 +31,8 @@ HEADERS += \
     lib/htmlcxx/html/Uri.h \
     lib/htmlcxx/html/utils.h \
     lib/hcxselect/hcxselect.h \
-    lib/hcxselect/lexer.h
+    lib/hcxselect/lexer.h \
+    httpclient.h
 
 FORMS += \
     mainwindow.ui
@@ -41,3 +43,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 INCLUDEPATH += $$PWD/lib
+
+RESOURCES += \
+    icons/tango/tango.qrc

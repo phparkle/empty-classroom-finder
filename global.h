@@ -3,6 +3,6 @@
 
 #include <QDir>
 
-extern const QDir dataDir;
+QDir getHtmlDir();
 
 #endif // GLOBAL_H

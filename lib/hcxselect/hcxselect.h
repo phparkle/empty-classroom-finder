@@ -83,6 +83,16 @@ typedef std::set<Node *, NodeComp> NodeSet;
 NodeSet select(const tree<htmlcxx::HTML::Node> &tree, const std::string &expr);
 
 /*!
+ * Applies a CSS selector expression to a single node.
+ * \note May throw a ParseException.
+ *
+ * \param nodes The node
+ * \param expr The CSS selector expression
+ * \returns A set of nodes that matches the given selector
+ */
+NodeSet select(Node* node, const std::string &expr);
+
+/*!
  * Applies a CSS selector expression to a set of nodes.
  * \note May throw a ParseException.
  *
@@ -91,7 +101,6 @@ NodeSet select(const tree<htmlcxx::HTML::Node> &tree, const std::string &expr);
  * \returns A set of nodes that matches the given selector
  */
 NodeSet select(const NodeSet &nodes, const std::string &expr);
-
 
 /*!
  * Convenient wrapper class for select().
@@ -104,9 +113,10 @@ class Selection : public NodeSet
 public:
 	Selection();
 	Selection(const tree<htmlcxx::HTML::Node> &tree, const std::string &expr = std::string());
-	Selection(const NodeSet &nodes, const std::string &expr = std::string());
+    Selection(Node* node, const std::string &expr = std::string());
+    Selection(const NodeSet &nodes, const std::string &expr = std::string());
 
-	Selection select(const std::string &expr);
+    Selection select(const std::string &expr) const;
 };
 
 typedef Selection Selector;

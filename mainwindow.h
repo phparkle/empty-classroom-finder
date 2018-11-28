@@ -1,13 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <hcxselect/hcxselect.h>
+
 #include <QMainWindow>
 
 namespace Ui {
 class MainWindow;
 }
 
-class QNetworkAccessManager;
+class HttpClient;
 
 class MainWindow : public QMainWindow
 {
@@ -17,10 +19,13 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private:
-    Ui::MainWindow* const ui;
+private slots:
 
-    QNetworkAccessManager* const qnam;
+private:
+    void parseHtml();
+
+    Ui::MainWindow* const ui;
+    HttpClient* const client;
 };
 
 #endif // MAINWINDOW_H
