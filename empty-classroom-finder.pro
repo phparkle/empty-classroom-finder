@@ -15,7 +15,9 @@ SOURCES += \
     lib/htmlcxx/html/Uri.cc \
     lib/htmlcxx/html/utils.cc \
     lib/hcxselect/hcxselect.cpp \
-    httpclient.cpp
+    httpclient.cpp \
+    emptyclassroomfinder.cpp \
+    address.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -32,7 +34,10 @@ HEADERS += \
     lib/htmlcxx/html/utils.h \
     lib/hcxselect/hcxselect.h \
     lib/hcxselect/lexer.h \
-    httpclient.h
+    httpclient.h \
+    emptyclassroomfinder.h \
+    address.h \
+    weektime.h
 
 FORMS += \
     mainwindow.ui

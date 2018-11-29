@@ -50,6 +50,7 @@ void HttpClient::handleIndexReplyFinished() {
         const QUrl deptUrl = QString::fromStdString(deptHref);
         requestDept(reply->url().resolved(deptUrl));
     }
+    reply->deleteLater();
 }
 
 void HttpClient::handleDeptReplyFinished() {
@@ -64,4 +65,5 @@ void HttpClient::handleDeptReplyFinished() {
     QMutexLocker locker(&mutex);
     if (--deptsRemaining == 0)
         emit finished();
+    reply->deleteLater();
 }
