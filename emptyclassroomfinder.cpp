@@ -78,7 +78,7 @@ Address parseAddress(hcxselect::Node* node) {
     roomText = roomText.left(paren - 1);
     const int comma = roomText.indexOf(',');
     QString name = roomText.left(comma);
-    QString area = comma == -1 ? "" : roomText.mid(comma + 2);
+    QString area = comma == -1 ? "Other" : roomText.mid(comma + 2);
     return { name, area };
 }
 

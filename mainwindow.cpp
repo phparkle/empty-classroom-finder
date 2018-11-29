@@ -35,13 +35,16 @@ void MainWindow::initUI(){
     QDate todayDate  = now.date();
     int toDay = todayDate.dayOfWeek() - 1;
 
-    QPushButton* weekdayButton[] = { ui->monButton, ui->tueButton, ui->wedButton, ui->thuButton, ui->friButton };
-    weekdayButton[toDay]->setDown(true);
+    weekdayButtons[0] = ui->monButton;
+    weekdayButtons[1] = ui->tueButton;
+    weekdayButtons[2] = ui->wedButton;
+    weekdayButtons[3] = ui->thuButton;
+    weekdayButtons[4] = ui->friButton;
 
     QTime timeNow = now.time();
 
     for (QTime t = QTime(9,0); t != QTime(0, 0); t = t.addSecs(1800)){
-        ui->startTimeCombo->addItem(t.toString("hh:mm AP"));
+        ui->startTimeCombo->addItem(t.toString("hh:mm AP"), t);
     }
 
     ui->durationCombo->addItem("30 minutes");
@@ -58,14 +61,62 @@ void MainWindow::initUI(){
             this, SLOT(handleInputChanged()));
     connect(ui->durationCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(handleInputChanged()));
+    connect(ui->areaList, SIGNAL(itemSelectionChanged()),
+            this, SLOT(handleAreaListSelectionChanged()));
 
     for (int i = 0; i<5; ++i)
-        connect(weekdayButton[i], &QPushButton::pressed,
+        connect(weekdayButtons[i], &QPushButton::clicked,
                 this , &MainWindow::handleInputChanged);
 
+    // weekdayButtons[toDay]->setChecked(true);
 
+    ui->areaList->setSortingEnabled(true);
+    ui->roomList->setSortingEnabled(true);
+
+    ui->statusBar->showMessage("Please select a weekday");
+
+    // handleInputChanged();
+}
+
+int MainWindow::getCheckedButton() {
+    for (int i = 0; i < 5; ++i)
+        if (weekdayButtons[i]->isChecked())
+            return i;
+    return -1;
 }
 
 void MainWindow::handleInputChanged() {
+    int weekday = getCheckedButton();
+    if (weekday == -1)
+        return;
+    ui->startTimeCombo->setEnabled(true);
+    ui->durationCombo->setEnabled(true);
+    int startTimeIndex = ui->startTimeCombo->currentIndex();
+    QTime startTime = ui->startTimeCombo->itemData(startTimeIndex).toTime();
+    int durationIndex = ui->durationCombo->currentIndex();
+    QTime endTime = startTime.addSecs((durationIndex + 1) * 30 * 60);
+    QSet<const Address*> rooms = finder->findEmptyRooms(weekday, startTime, endTime);
+    ui->statusBar->showMessage(QString("%1 empty classrooms found").arg(rooms.size()));
+    currRooms.clear();
+    for (const Address* addr : rooms)
+        currRooms[addr->getArea()].append(addr->getRoom());
+    ui->areaList->clear();
+    for (auto it = currRooms.constBegin(); it != currRooms.end(); ++it) {
+        QString format = "%1 (%2)";
+        QString area = it.key();
+        int count = it.value().size();
+        ui->areaList->addItem(format.arg(area, count));
+    }
+    ui->areaList->addItems(currRooms.keys());
+    ui->roomList->clear();
+}
 
+void MainWindow::handleAreaListSelectionChanged() {
+    QString currArea = ui->areaList->currentItem()->text();
+    if (currArea.isEmpty())
+        return;
+    int paren = currArea.lastIndexOf('(');
+    QString key = currArea.left(paren - 1);
+    ui->roomList->clear();
+    ui->roomList->addItems(currRooms[key]);
 }
