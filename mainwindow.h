@@ -20,8 +20,11 @@ public:
     ~MainWindow();
 
 private slots:
+    void handleInputChanged();
+
 
 private:
+    void initUI();
     void parseHtml();
 
     Ui::MainWindow* const ui;
