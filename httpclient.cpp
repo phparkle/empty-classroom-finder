@@ -15,19 +15,27 @@ HttpClient::HttpClient(QObject* parent) : QObject(parent)
 {
 }
 
-void HttpClient::downloadAll(const QUrl indexUrl) {
-    requestIndex(indexUrl);
+QString HttpClient::getIndexUrl() {
+    const QDate today = QDate::currentDate();
+    const QString year = today.toString("yy");
+    const QString semester = today.month() > 6 ? "10" : "30";
+    return QString("https://w5.ab.ust.hk/wcq/cgi-bin/%1%2/").arg(year).arg(semester);
+}
+
+void HttpClient::downloadAll() {
+    if (getHtmlDir().exists())
+        emit finished();
+    else requestIndex(getIndexUrl());
 }
 
 void HttpClient::requestIndex(const QUrl indexUrl) {
-    qDebug() << "REQUEST" << indexUrl;
+    emit statusChanged(QString("Downloading %1").arg(indexUrl.toString()));
     QNetworkReply* const reply = manager.get(QNetworkRequest(indexUrl));
     connect(reply, &QNetworkReply::finished,
             this, &HttpClient::handleIndexReplyFinished);
 }
 
 void HttpClient::requestDept(const QUrl deptUrl) {
-    qDebug() << "REQUEST" << deptUrl;
     QNetworkReply* const reply = manager.get(QNetworkRequest(deptUrl));
     connect(reply, &QNetworkReply::finished,
             this, &HttpClient::handleDeptReplyFinished);
@@ -35,7 +43,6 @@ void HttpClient::requestDept(const QUrl deptUrl) {
 
 void HttpClient::handleIndexReplyFinished() {
     QNetworkReply* const reply = static_cast<QNetworkReply*>(QObject::sender());
-    qDebug() << "REPLY" << reply->url();
     const std::string html = reply->readAll().toStdString();
     HTML::ParserDom parser;
     const tree<HTML::Node>& dom = parser.parseTree(html);
@@ -55,14 +62,14 @@ void HttpClient::handleIndexReplyFinished() {
 
 void HttpClient::handleDeptReplyFinished() {
     QNetworkReply* const reply = static_cast<QNetworkReply*>(QObject::sender());
-    qDebug() << "REPLY" << reply->url();
+    const QUrl deptUrl = reply->url();
+    emit statusChanged(QString("Downloading %1").arg(deptUrl.toString()));
     const QDir htmlDir = getHtmlDir();
     if (!htmlDir.exists()) htmlDir.mkpath(".");
-    QString filename = reply->url().path().section('/', -1).append(".html");
+    QString filename = deptUrl.path().section('/', -1).append(".html");
     QFile file(htmlDir.filePath(filename));
     file.open(QIODevice::WriteOnly);
     file.write(reply->readAll());
-    QMutexLocker locker(&mutex);
     if (--deptsRemaining == 0)
         emit finished();
     reply->deleteLater();
