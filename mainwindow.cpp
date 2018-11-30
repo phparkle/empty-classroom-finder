@@ -42,12 +42,14 @@ void MainWindow::initUI(){
     resize(desktop.width() * 4 / 10, desktop.height() * 6 / 10);
     setWindowTitle("HKUST Empty Classroom Finder");
 
+    //creating an array of buttons for selecting weekdays
     weekdayButtons[0] = ui->monButton;
     weekdayButtons[1] = ui->tueButton;
     weekdayButtons[2] = ui->wedButton;
     weekdayButtons[3] = ui->thuButton;
     weekdayButtons[4] = ui->friButton;
 
+    // creating combo box for selecting time and duration
     for (QTime t = QTime(9,0); t != QTime(0, 0); t = t.addSecs(1800))
         ui->startTimeCombo->addItem(t.toString("hh:mm AP"), t);
 
@@ -61,18 +63,22 @@ void MainWindow::initUI(){
         ui->durationCombo->addItem(item);
     }
 
+    //connecting the combo boxes with the respective handler functions
     connect(ui->startTimeCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(handleInputChanged()));
     connect(ui->durationCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(handleInputChanged()));
     connect(ui->areaList, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
             this, SLOT(handleAreaListCurrentItemChanged(QListWidgetItem*)));
+
+    //connecting the pushbuttons with the input handler fucntion
     for (int i = 0; i < 5; ++i)
         connect(weekdayButtons[i], &QPushButton::clicked,
                 this , &MainWindow::handleInputChanged);
 }
 
 int MainWindow::getCheckedButton() {
+    //checking if the button has been pressed or not
     for (int i = 0; i < 5; ++i)
         if (weekdayButtons[i]->isChecked())
             return i;
@@ -93,20 +99,28 @@ void MainWindow::handleInputChanged() {
     int weekday = getCheckedButton();
     if (weekday == -1)
         return;
+
+    //enables the combo boxes and area and room lists once the day is selected
     ui->startTimeCombo->setEnabled(true);
     ui->durationCombo->setEnabled(true);
     ui->areaList->setEnabled(true);
     ui->roomList->setEnabled(true);
+
+    //extracting the time selected by the user
     int startTimeIndex = ui->startTimeCombo->currentIndex();
     QTime startTime = ui->startTimeCombo->itemData(startTimeIndex).toTime();
     int durationIndex = ui->durationCombo->currentIndex();
     QTime endTime = startTime.addSecs((durationIndex + 1) * 30 * 60);
+
+    //using the data extracted from the html file
     QSet<const Address*> rooms = finder->findEmptyRooms(weekday, startTime, endTime);
     handleStatusChanged(QString("%1 empty classrooms found").arg(rooms.size()));
     currRooms.clear();
     for (const Address* addr : rooms)
         currRooms[addr->getArea()].append(addr->getRoom());
     ui->areaList->clear();
+
+    // adds the number of rooms available to each area and displays the area list
     for (auto it = currRooms.constBegin(); it != currRooms.constEnd(); ++it) {
         const QString format = "%1 (%2)";
         const QString area = it.key();
@@ -119,6 +133,7 @@ void MainWindow::handleInputChanged() {
 }
 
 void MainWindow::handleAreaListCurrentItemChanged(QListWidgetItem* currItem) {
+    // handles the display of the rooms at a specific area
     if (!currItem)
         return;
     const QString currArea = currItem->data(Qt::UserRole).toString();
@@ -127,5 +142,6 @@ void MainWindow::handleAreaListCurrentItemChanged(QListWidgetItem* currItem) {
 }
 
 void MainWindow::handleStatusChanged(QString message) {
+    //displays the message at the bottom of the main window
     ui->statusBar->showMessage(message);
 }
